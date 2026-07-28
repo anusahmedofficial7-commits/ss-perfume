@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}
+Track Order
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.track-card{
+    max-width:750px;
+    margin:auto;
+    border:none;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,.12);
+}
+
+.status-badge{
+    font-size:16px;
+    padding:10px 18px;
+    border-radius:30px;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card track-card mt-5">
+
+<div class="card-body p-5">
+
+<h2 class="text-center mb-4">
+
+📦 Track Your Order
+
+</h2>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<div class="input-group mb-4">
+
+<input
+type="text"
+name="order_number"
+class="form-control form-control-lg"
+placeholder="Enter Order Number (Example: ORD123456)"
+required>
+
+<button
+class="btn btn-dark btn-lg"
+type="submit">
+
+Search
+
+</button>
+
+</div>
+
+</form>
+
+{% if order %}
+
+<hr>
+
+<h4 class="mb-3">
+
+Order Details
+
+</h4>
+
+<table class="table table-bordered">
+
+<tr>
+
+<th>Order Number</th>
+
+<td>{{ order.order_number }}</td>
+
+</tr>
+
+<tr>
+
+<th>Customer Name</th>
+
+<td>{{ order.customer_name }}</td>
+
+</tr>
+
+<tr>
+
+<th>Phone</th>
+
+<td>{{ order.phone }}</td>
+
+</tr>
+
+<tr>
+
+<th>Address</th>
+
+<td>{{ order.address }}</td>
+
+</tr>
+
+<tr>
+
+<th>Total Amount</th>
+
+<td><strong>Rs. {{ order.total_amount }}</strong></td>
+
+</tr>
+
+<tr>
+
+<th>Order Date</th>
+
+<td>{{ order.created_at }}</td>
+
+</tr>
+
+<tr>
+
+<th>Status</th>
+
+<td>
+
+{% if order.status == "Pending" %}
+
+<span class="badge bg-warning text-dark status-badge">
+Pending
+</span>
+
+{% elif order.status == "Confirmed" %}
+
+<span class="badge bg-primary status-badge">
+Confirmed
+</span>
+
+{% elif order.status == "Shipped" %}
+
+<span class="badge bg-info status-badge">
+Shipped
+</span>
+
+{% elif order.status == "Delivered" %}
+
+<span class="badge bg-success status-badge">
+Delivered
+</span>
+
+{% elif order.status == "Cancelled" %}
+
+<span class="badge bg-danger status-badge">
+Cancelled
+</span>
+
+{% endif %}
+
+</td>
+
+</tr>
+
+</table>
+
+{% else %}
+
+<div class="alert alert-info text-center">
+
+Enter your Order Number to check your order status.
+
+</div>
+
+{% endif %}
+
+</div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}
+My Wishlist
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.wishlist-card{
+    border:none;
+    border-radius:20px;
+    overflow:hidden;
+    transition:.3s;
+}
+
+.wishlist-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.wishlist-card img{
+    height:280px;
+    object-fit:cover;
+}
+
+.price{
+    color:#198754;
+    font-size:22px;
+    font-weight:bold;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+
+❤️ My Wishlist
+
+</h2>
+
+{% if wishlist_items %}
+
+<div class="row">
+
+{% for item in wishlist_items %}
+
+<div class="col-lg-4 col-md-6 mb-4">
+
+<div class="card wishlist-card h-100">
+
+<img
+src="{{ item.perfume.image.url }}"
+class="card-img-top"
+alt="{{ item.perfume.name }}">
+
+<div class="card-body">
+
+<h4>{{ item.perfume.name }}</h4>
+
+<h6 class="text-muted">
+
+{{ item.perfume.brand }}
+
+</h6>
+
+{% if item.perfume.sizes.first %}
+
+<div class="price mb-2">
+
+Rs. {{ item.perfume.sizes.first.price }}
+
+</div>
+
+{% endif %}
+
+<p>
+
+{{ item.perfume.description|truncatewords:18 }}
+
+</p>
+
+<div class="d-grid gap-2">
+
+<a
+href="{% url 'product_detail' item.perfume.id %}"
+class="btn btn-dark">
+
+👁 View Details
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="alert alert-warning text-center p-5">
+
+<h3>Your Wishlist is Empty</h3>
+
+<p>
+
+Save your favourite perfumes here.
+
+</p>
+
+<a
+href="{% url 'home' %}"
+class="btn btn-gold">
+
+Continue Shopping
+
+</a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

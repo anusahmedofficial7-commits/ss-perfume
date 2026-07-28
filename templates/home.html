@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}
+Luxury Perfume Store
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+body{
+    background:#f5f5f5;
+}
+
+.hero{
+    min-height:90vh;
+    background:linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+    url("https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=1600");
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    border-radius:20px;
+    padding:40px 20px;
+    margin-bottom:50px;
+}
+
+.hero h1{
+    color:#d4af37;
+    font-size:65px;
+    font-weight:bold;
+}
+
+.hero p{
+    color:#fff;
+    font-size:22px;
+    margin-top:15px;
+}
+
+.btn-gold{
+    background:#d4af37;
+    color:#000;
+    font-weight:bold;
+    border:none;
+    padding:12px 35px;
+    border-radius:30px;
+}
+
+.btn-gold:hover{
+    background:#b8860b;
+    color:#fff;
+}
+
+.section-title{
+    font-weight:bold;
+}
+
+.card{
+    border:none;
+    border-radius:18px;
+    overflow:hidden;
+    transition:.35s;
+}
+
+.card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 35px rgba(0,0,0,.18);
+}
+
+.card img{
+    height:320px;
+    object-fit:cover;
+}
+
+.price{
+    color:#198754;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.rating{
+    color:gold;
+    font-size:18px;
+}
+
+.badge{
+    margin-right:5px;
+}
+
+@media(max-width:768px){
+
+.hero{
+    min-height:60vh;
+}
+
+.hero h1{
+    font-size:38px;
+}
+
+.hero p{
+    font-size:18px;
+}
+
+.card img{
+    height:240px;
+}
+
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+
+<div>
+
+<h1>Luxury Perfume Collection</h1>
+
+<p>
+Premium Imported Perfumes & Original Attars
+</p>
+
+<a href="#products" class="btn btn-gold btn-lg mt-3">
+Shop Now
+</a>
+
+</div>
+
+</section>
+
+<div class="row mb-4" id="products">
+
+<div class="col-md-6">
+
+<h2 class="section-title">
+Our Premium Collection
+</h2>
+
+</div>
+
+<div class="col-md-6">
+
+<input
+type="text"
+id="searchInput"
+class="form-control"
+placeholder="Search Perfume..."
+onkeyup="searchPerfume()">
+
+</div>
+
+</div>
+
+<div class="row">
+
+{% for perfume in perfumes %}
+
+<div class="col-lg-4 col-md-6 mb-4 perfume-card">
+
+<div class="card h-100">
+
+<img
+src="{{ perfume.image.url }}"
+class="card-img-top"
+alt="{{ perfume.name }}">
+
+<div class="card-body">
+
+<h4>{{ perfume.name }}</h4>
+
+<h6 class="text-muted">
+{{ perfume.brand }}
+</h6>
+
+{% if perfume.new_arrival %}
+<span class="badge bg-success">New</span>
+{% endif %}
+
+{% if perfume.best_seller %}
+<span class="badge bg-danger">Best Seller</span>
+{% endif %}
+
+{% if perfume.featured %}
+<span class="badge bg-warning text-dark">Featured</span>
+{% endif %}
+
+<div class="rating mt-2">
+★★★★★
+</div>
+
+{% if perfume.sizes.first %}
+
+<div class="price mt-2">
+Starting From Rs. {{ perfume.sizes.first.price }}
+</div>
+
+{% endif %}
+
+{% if perfume.stock > 0 %}
+
+<p class="text-success mt-2">
+✔ In Stock ({{ perfume.stock }})
+</p>
+
+{% else %}
+
+<p class="text-danger mt-2">
+Out Of Stock
+</p>
+
+{% endif %}
+
+<p>
+{{ perfume.description|truncatewords:18 }}
+</p>
+<div class="d-grid gap-2 mt-3">
+
+<a
+href="{% url 'product_detail' perfume.id %}"
+class="btn btn-dark">
+
+👁 View Details
+
+</a>
+
+<form
+method="POST"
+action="{% url 'add_to_wishlist' perfume.id %}">
+
+{% csrf_token %}
+
+<button
+type="submit"
+class="btn btn-outline-danger w-100">
+
+❤️ Add To Wishlist
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<div class="col-12">
+
+<div class="alert alert-warning text-center p-5">
+
+<h3>No Perfumes Available</h3>
+
+<p>Please check back later for new arrivals.</p>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<section class="mt-5">
+
+<div class="row text-center">
+
+<div class="col-md-4 mb-4">
+
+<div class="card p-4 h-100">
+
+<h3>🚚</h3>
+
+<h5>Fast Delivery</h5>
+
+<p>Quick and secure delivery across Pakistan.</p>
+
+</div>
+
+</div>
+
+<div class="col-md-4 mb-4">
+
+<div class="card p-4 h-100">
+
+<h3>🛡️</h3>
+
+<h5>100% Original</h5>
+
+<p>We sell only genuine imported perfumes and attars.</p>
+
+</div>
+
+</div>
+
+<div class="col-md-4 mb-4">
+
+<div class="card p-4 h-100">
+
+<h3>💳</h3>
+
+<h5>Cash on Delivery</h5>
+
+<p>Easy and secure Cash on Delivery service available.</p>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<div class="container">
+
+<div class="row">
+
+<div class="col-md-4">
+
+<h4 class="text-warning">
+Luxury Perfume Store
+</h4>
+
+<p>
+Premium imported perfumes and original attars with trusted quality.
+</p>
+
+</div>
+
+<div class="col-md-4">
+
+<h5>Quick Links</h5>
+
+<ul class="list-unstyled">
+
+<li><a href="{% url 'home' %}" class="text-white text-decoration-none">Home</a></li>
+
+<li><a href="{% url 'wishlist' %}" class="text-white text-decoration-none">Wishlist</a></li>
+
+<li><a href="{% url 'cart' %}" class="text-white text-decoration-none">Cart</a></li>
+
+<li><a href="{% url 'track_order' %}" class="text-white text-decoration-none">Track Order</a></li>
+
+</ul>
+
+</div>
+
+<div class="col-md-4">
+
+<h5>Contact</h5>
+
+<p>📞 +92-300-0000000</p>
+
+<p>✉ info@luxuryperfume.com</p>
+
+<p>📍 Karachi, Pakistan</p>
+
+</div>
+
+</div>
+
+<hr>
+
+<div class="text-center">
+
+© 2026 Luxury Perfume Store. All Rights Reserved.
+
+</div>
+
+</div>
+
+</footer>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+function searchPerfume(){
+
+let input =
+document.getElementById("searchInput").value.toLowerCase();
+
+let cards =
+document.querySelectorAll(".perfume-card");
+
+cards.forEach(function(card){
+
+let text =
+card.innerText.toLowerCase();
+
+if(text.includes(input)){
+
+card.style.display="block";
+
+}else{
+
+card.style.display="none";
+
+}
+
+});
+
+}
+
+</script>
+
+{% endblock %}

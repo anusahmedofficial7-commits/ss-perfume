@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}
+Create Account
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.signup-card{
+    max-width:550px;
+    margin:60px auto;
+    border:none;
+    border-radius:20px;
+    box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+.signup-header{
+    background:#111;
+    color:#d4af37;
+    text-align:center;
+    padding:25px;
+    border-radius:20px 20px 0 0;
+}
+
+.btn-signup{
+    background:#d4af37;
+    color:#000;
+    font-weight:bold;
+    border:none;
+}
+
+.btn-signup:hover{
+    background:#b8860b;
+    color:#fff;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="card signup-card">
+
+<div class="signup-header">
+
+<h2>📝 Create Account</h2>
+
+<p>Join Luxury Perfume Store</p>
+
+</div>
+
+<div class="card-body p-4">
+
+<form method="POST">
+
+{% csrf_token %}
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Username
+
+</label>
+
+<input
+type="text"
+name="username"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Email
+
+</label>
+
+<input
+type="email"
+name="email"
+class="form-control"
+required>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">
+
+Password
+
+</label>
+
+<input
+type="password"
+name="password"
+class="form-control"
+required>
+
+</div>
+
+<button
+type="submit"
+class="btn btn-signup w-100">
+
+Create Account
+
+</button>
+
+</form>
+
+<hr>
+
+<p class="text-center">
+
+Already have an account?
+
+<a href="{% url 'login' %}">
+
+Login
+
+</a>
+
+</p>
+
+</div>
+
+</div>
+
+{% endblock %}

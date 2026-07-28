@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ perfume.name }}
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.product-image{
+    width:100%;
+    height:550px;
+    object-fit:cover;
+    border-radius:20px;
+}
+
+.price{
+    color:#198754;
+    font-size:32px;
+    font-weight:bold;
+}
+
+.review-card{
+    border-radius:15px;
+    margin-bottom:15px;
+}
+
+.star{
+    color:#ffc107;
+    font-size:20px;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+
+<div class="col-lg-6">
+
+<img
+src="{{ perfume.image.url }}"
+class="product-image">
+
+</div>
+
+<div class="col-lg-6">
+
+<h1>{{ perfume.name }}</h1>
+
+<h4 class="text-muted">
+
+{{ perfume.brand }}
+
+</h4>
+
+<p class="mt-3">
+
+{{ perfume.description }}
+
+</p>
+
+<form
+method="POST"
+action="{% url 'add_to_cart' perfume.id %}">
+
+{% csrf_token %}
+
+<label class="form-label">
+
+Choose Size
+
+</label>
+
+<select
+name="size"
+class="form-select mb-3">
+
+{% for size in sizes %}
+
+<option value="{{ size.size }}">
+
+{{ size.size }} - Rs. {{ size.price }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+{% if sizes %}
+
+<div class="price mb-3">
+
+Starting From Rs. {{ sizes.0.price }}
+
+</div>
+
+{% endif %}
+
+<button
+type="submit"
+class="btn btn-gold btn-lg w-100">
+
+🛒 Add To Cart
+
+</button>
+
+</form>
+
+<form
+method="POST"
+action="{% url 'add_to_wishlist' perfume.id %}"
+class="mt-3">
+
+{% csrf_token %}
+
+<button
+class="btn btn-outline-danger w-100">
+
+❤️ Add To Wishlist
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+<hr class="my-5">
+
+<h2>
+
+⭐ Customer Reviews
+
+</h2>
+
+{% if user.is_authenticated %}
+
+<form method="POST">
+
+{% csrf_token %}
+
+<div class="mb-3">
+
+<label>
+
+Rating
+
+</label>
+
+<select
+name="rating"
+class="form-select">
+
+<option value="5">★★★★★</option>
+<option value="4">★★★★☆</option>
+<option value="3">★★★☆☆</option>
+<option value="2">★★☆☆☆</option>
+<option value="1">★☆☆☆☆</option>
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<textarea
+name="comment"
+class="form-control"
+rows="4"
+placeholder="Write your review..."
+required></textarea>
+
+</div>
+
+<button
+class="btn btn-dark">
+
+Submit Review
+
+</button>
+
+</form>
+
+<hr>
+
+{% endif %}
+
+{% for review in reviews %}
+
+<div class="card review-card shadow">
+
+<div class="card-body">
+
+<h5>
+
+{{ review.user.username }}
+
+</h5>
+
+<div class="star">
+
+{% for i in "12345" %}
+
+{% if forloop.counter <= review.rating %}
+
+★
+
+{% else %}
+
+☆
+
+{% endif %}
+
+{% endfor %}
+
+</div>
+
+<p class="mt-2">
+
+{{ review.comment }}
+
+</p>
+
+<small class="text-muted">
+
+{{ review.created_at }}
+
+</small>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<div class="alert alert-info">
+
+No reviews yet.
+
+</div>
+
+{% endfor %}
+
+{% endblock %}
+@login_required
+def product_detail(request, id):
+    perfume = get_object_or_404(Perfume, id=id)
+
+    if request.method == "POST":
+        Review.objects.create(
+            user=request.user,
+            perfume=perfume,
+            rating=request.POST["rating"],
+            comment=request.POST["comment"]
+        )
+        messages.success(request, "Review added successfully.")
+        return redirect("product_detail", id=perfume.id)
+
+    sizes = perfume.sizes.all()
+    reviews = Review.objects.filter(perfume=perfume).order_by("-created_at")
+
+    return render(request, "product_detail.html", {
+        "perfume": perfume,
+        "sizes": sizes,
+        "reviews": reviews,
+    })
+    

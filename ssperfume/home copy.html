@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Perfumes</title>
+</head>
+<body>
+
+<h1>Perfume List</h1>
+
+{% for perfume in perfumes %}
+<div>
+    <img src="{{ perfume.image.url }}" width="200">
+    <p><strong>Brand:</strong> {{ perfume.brand }}</p>
+    <p><strong>Price:</strong> Rs. {{ perfume.price }}</p>
+    <p>{{ perfume.description }}</p>
+</div>
+<hr>
+{% empty %}
+<p>No perfumes found.</p>
+{% endfor %}
+
+</body>
+</html>

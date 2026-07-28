@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}
+About Us
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+
+.about-banner{
+    background:linear-gradient(rgba(0,0,0,.65),rgba(0,0,0,.65)),
+    url("https://images.unsplash.com/photo-1541643600914-78b084683601?w=1600");
+    background-size:cover;
+    background-position:center;
+    min-height:320px;
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    margin-bottom:50px;
+}
+
+.about-banner h1{
+    color:#d4af37;
+    font-size:55px;
+    font-weight:bold;
+}
+
+.info-card{
+    border:none;
+    border-radius:20px;
+    transition:.3s;
+}
+
+.info-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+.icon{
+    font-size:55px;
+    color:#d4af37;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="about-banner">
+
+<div>
+
+<h1>About Luxury Perfume Store</h1>
+
+<p class="text-white fs-5">
+
+Premium Imported Perfumes & Original Attars
+
+</p>
+
+</div>
+
+</section>
+
+<div class="row">
+
+<div class="col-md-4 mb-4">
+
+<div class="card info-card p-4 text-center h-100">
+
+<div class="icon">
+
+🌸
+
+</div>
+
+<h3 class="mt-3">
+
+Premium Quality
+
+</h3>
+
+<p>
+
+We provide only original imported perfumes and luxury attars with guaranteed quality.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="col-md-4 mb-4">
+
+<div class="card info-card p-4 text-center h-100">
+
+<div class="icon">
+
+🚚
+
+</div>
+
+<h3 class="mt-3">
+
+Fast Delivery
+
+</h3>
+
+<p>
+
+Fast and secure delivery across Pakistan with reliable service.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="col-md-4 mb-4">
+
+<div class="card info-card p-4 text-center h-100">
+
+<div class="icon">
+
+❤️
+
+</div>
+
+<h3 class="mt-3">
+
+Customer Satisfaction
+
+</h3>
+
+<p>
+
+Our goal is to provide the best shopping experience and excellent customer support.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card mt-4 border-0 shadow">
+
+<div class="card-body p-5">
+
+<h2 class="mb-4">
+
+Why Choose Us?
+
+</h2>
+
+<ul>
+
+<li>100% Original Imported Perfumes</li>
+
+<li>Luxury Attars Collection</li>
+
+<li>Affordable Prices</li>
+
+<li>Secure Ordering Process</li>
+
+<li>Cash on Delivery Available</li>
+
+<li>Friendly Customer Support</li>
+
+</ul>
+
+</div>
+
+</div>
+
+{% endblock %}
