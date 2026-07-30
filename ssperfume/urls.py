@@ -21,6 +21,7 @@ from perfume.views import (
     login_view,
     logout_view,
     profile,
+    about,   # <-- ADD THIS
 )
 
 urlpatterns = [
@@ -51,6 +52,9 @@ urlpatterns = [
 
     # Track Order
     path("track-order/", track_order, name="track_order"),
+
+    # About
+    path("about/", about, name="about"),
 
     # Authentication
     path("signup/", signup, name="signup"),
