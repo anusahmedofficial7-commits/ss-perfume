@@ -33,6 +33,10 @@ def home(request):
             Q(description__icontains=query)
         )
 
+    featured = perfumes.filter(featured=True)
+    best_sellers = perfumes.filter(best_seller=True)
+    new_arrivals = perfumes.filter(new_arrival=True)
+
     cart_count = 0
     wishlist_count = 0
 
@@ -40,12 +44,17 @@ def home(request):
         cart_count = Cart.objects.filter(user=request.user).count()
         wishlist_count = Wishlist.objects.filter(user=request.user).count()
 
-    return render(request, "home.html", {
+    context = {
         "perfumes": perfumes,
+        "featured": featured,
+        "best_sellers": best_sellers,
+        "new_arrivals": new_arrivals,
         "query": query,
         "cart_count": cart_count,
         "wishlist_count": wishlist_count,
-    })
+    }
+
+    return render(request, "home.html", context)
 
 
 # ==========================
@@ -54,7 +63,10 @@ def home(request):
 
 def product_detail(request, id):
 
-    perfume = get_object_or_404(Perfume, id=id)
+    perfume = get_object_or_404(
+        Perfume,
+        id=id
+    )
 
     if request.method == "POST":
 
@@ -65,12 +77,18 @@ def product_detail(request, id):
             user=request.user,
             perfume=perfume,
             rating=request.POST.get("rating"),
-            comment=request.POST.get("comment")
+            comment=request.POST.get("comment"),
         )
 
-        messages.success(request, "Review submitted successfully.")
+        messages.success(
+            request,
+            "Review submitted successfully."
+        )
 
-        return redirect("product_detail", id=id)
+        return redirect(
+            "product_detail",
+            id=id
+        )
 
     sizes = perfume.sizes.all()
 
@@ -78,14 +96,23 @@ def product_detail(request, id):
         perfume=perfume
     ).order_by("-created_at")
 
-    return render(request, "product_detail.html", {
-        "perfume": perfume,
-        "sizes": sizes,
-        "reviews": reviews,
-    })
+    related_products = Perfume.objects.filter(
+        category=perfume.category
+    ).exclude(
+        id=perfume.id
+    )[:4]
 
-
-# ==========================
+    return render(
+        request,
+        "product_detail.html",
+        {
+            "perfume": perfume,
+            "sizes": sizes,
+            "reviews": reviews,
+            "related_products": related_products,
+        },
+    )
+    # ==========================
 # ADD TO CART
 # ==========================
 
@@ -95,6 +122,10 @@ def add_to_cart(request, id):
     perfume = get_object_or_404(Perfume, id=id)
 
     size = request.POST.get("size")
+
+    if not size:
+        messages.error(request, "Please select a perfume size.")
+        return redirect("product_detail", id=id)
 
     perfume_size = get_object_or_404(
         PerfumeSize,
@@ -107,7 +138,9 @@ def add_to_cart(request, id):
         perfume=perfume,
         size=size,
         defaults={
-            "price": perfume_size.price
+            "price": perfume_size.discount_price
+            if perfume_size.discount_price
+            else perfume_size.price
         }
     )
 
@@ -115,7 +148,7 @@ def add_to_cart(request, id):
         cart_item.quantity += 1
         cart_item.save()
 
-    messages.success(request, "Product added to cart.")
+    messages.success(request, "Product added to cart successfully.")
 
     return redirect("cart")
 
@@ -135,11 +168,17 @@ def cart(request):
         item.subtotal = item.price * item.quantity
         total += item.subtotal
 
-    return render(request, "cart.html", {
-        "cart_items": cart_items,
-        "total": total,
-    })
-    # ==========================
+    return render(
+        request,
+        "cart.html",
+        {
+            "cart_items": cart_items,
+            "total": total,
+        }
+    )
+
+
+# ==========================
 # INCREASE QUANTITY
 # ==========================
 
@@ -214,9 +253,13 @@ def wishlist(request):
         user=request.user
     )
 
-    return render(request, "wishlist.html", {
-        "wishlist_items": wishlist_items
-    })
+    return render(
+        request,
+        "wishlist.html",
+        {
+            "wishlist_items": wishlist_items
+        }
+    )
 
 
 # ==========================
@@ -238,30 +281,21 @@ def add_to_wishlist(request, id):
 
     messages.success(
         request,
-        "Added to wishlist."
+        "Added to wishlist successfully."
     )
 
     return redirect("wishlist")
-
-
-# ==========================
+    # ==========================
 # CHECKOUT
 # ==========================
 
 @login_required
 def checkout(request):
 
-    cart_items = Cart.objects.filter(
-        user=request.user
-    )
+    cart_items = Cart.objects.filter(user=request.user)
 
     if not cart_items.exists():
-
-        messages.warning(
-            request,
-            "Your cart is empty."
-        )
-
+        messages.warning(request, "Your cart is empty.")
         return redirect("home")
 
     total = 0
@@ -270,11 +304,23 @@ def checkout(request):
         item.subtotal = item.price * item.quantity
         total += item.subtotal
 
-    return render(request, "checkout.html", {
+    context = {
         "cart_items": cart_items,
         "total": total,
-    })
-    # ==========================
+
+        # Client apni details yahan change karega
+        "bank_name": "Allied Bank Limited",
+        "account_title": "YOUR ACCOUNT TITLE",
+        "account_number": "0000-0000000000",
+        "iban": "PK00ABCD0000000000000000",
+        "jazzcash": "03XX-XXXXXXX",
+        "easypaisa": "03XX-XXXXXXX",
+    }
+
+    return render(request, "checkout.html", context)
+
+
+# ==========================
 # PLACE ORDER
 # ==========================
 
@@ -292,25 +338,43 @@ def place_order(request):
 
     total = sum(item.price * item.quantity for item in cart_items)
 
+    payment_method = request.POST.get("payment_method")
+    transaction_id = request.POST.get("transaction_id")
+
     order_number = "ORD" + str(random.randint(100000, 999999))
 
     while Order.objects.filter(order_number=order_number).exists():
         order_number = "ORD" + str(random.randint(100000, 999999))
+
+    payment_status = "Pending"
+
+    if payment_method == "COD":
+        payment_status = "Pending"
+    else:
+        payment_status = "Paid" if transaction_id else "Pending"
 
     Order.objects.create(
         user=request.user,
         customer_name=request.POST.get("name"),
         phone=request.POST.get("phone"),
         address=request.POST.get("address"),
+        city=request.POST.get("city"),
         total_amount=total,
         order_number=order_number,
+
+        payment_method=payment_method,
+        transaction_id=transaction_id,
+        payment_status=payment_status,
+
+        status="Pending",
+        notes=request.POST.get("notes"),
     )
 
     cart_items.delete()
 
     messages.success(
         request,
-        f"Order placed successfully. Order Number: {order_number}"
+        f"Your order has been placed successfully. Order Number: {order_number}"
     )
 
     return redirect("success")
@@ -323,9 +387,7 @@ def place_order(request):
 @login_required
 def success(request):
     return render(request, "success.html")
-
-
-# ==========================
+    # ==========================
 # TRACK ORDER
 # ==========================
 
@@ -341,12 +403,19 @@ def track_order(request):
             order_number=order_number
         ).first()
 
-        if not order:
-            messages.error(request, "Order not found.")
+        if order is None:
+            messages.error(
+                request,
+                "Order not found."
+            )
 
-    return render(request, "track_order.html", {
-        "order": order
-    })
+    return render(
+        request,
+        "track_order.html",
+        {
+            "order": order
+        }
+    )
 
 
 # ==========================
@@ -375,7 +444,10 @@ def signup(request):
             password=password
         )
 
-        messages.success(request, "Account created successfully.")
+        messages.success(
+            request,
+            "Account created successfully. Please login."
+        )
 
         return redirect("login")
 
@@ -388,21 +460,35 @@ def signup(request):
 
 def login_view(request):
 
+    if request.user.is_authenticated:
+        return redirect("home")
+
     if request.method == "POST":
 
         username = request.POST.get("username")
         password = request.POST.get("password")
 
         user = authenticate(
+            request,
             username=username,
             password=password
         )
 
-        if user:
+        if user is not None:
+
             login(request, user)
+
+            messages.success(
+                request,
+                f"Welcome {user.username}"
+            )
+
             return redirect("home")
 
-        messages.error(request, "Invalid username or password.")
+        messages.error(
+            request,
+            "Invalid username or password."
+        )
 
     return render(request, "login.html")
 
@@ -416,7 +502,10 @@ def logout_view(request):
 
     logout(request)
 
-    messages.success(request, "Logged out successfully.")
+    messages.success(
+        request,
+        "Logged out successfully."
+    )
 
     return redirect("home")
 
@@ -432,9 +521,16 @@ def profile(request):
         user=request.user
     ).order_by("-created_at")
 
-    return render(request, "profile.html", {
-        "orders": orders
-    })
+    total_orders = orders.count()
+
+    return render(
+        request,
+        "profile.html",
+        {
+            "orders": orders,
+            "total_orders": total_orders,
+        }
+    )
 
 
 # ==========================

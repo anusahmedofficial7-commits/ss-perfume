@@ -21,7 +21,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 # ==========================
-# PERFUME SIZE
+# PERFUME SIZE INLINE
 # ==========================
 
 class PerfumeSizeInline(admin.TabularInline):
@@ -45,6 +45,7 @@ class PerfumeAdmin(admin.ModelAdmin):
         "featured",
         "best_seller",
         "new_arrival",
+        "created_at",
     )
 
     list_filter = (
@@ -57,6 +58,7 @@ class PerfumeAdmin(admin.ModelAdmin):
     search_fields = (
         "name",
         "brand",
+        "description",
     )
 
     list_editable = (
@@ -65,6 +67,8 @@ class PerfumeAdmin(admin.ModelAdmin):
         "best_seller",
         "new_arrival",
     )
+
+    ordering = ("-created_at",)
 
     inlines = [PerfumeSizeInline]
 
@@ -80,12 +84,17 @@ class OrderAdmin(admin.ModelAdmin):
         "order_number",
         "customer_name",
         "phone",
+        "city",
         "total_amount",
+        "payment_method",
+        "payment_status",
         "status",
         "created_at",
     )
 
     list_filter = (
+        "payment_method",
+        "payment_status",
         "status",
         "created_at",
     )
@@ -94,11 +103,20 @@ class OrderAdmin(admin.ModelAdmin):
         "order_number",
         "customer_name",
         "phone",
+        "transaction_id",
     )
 
     list_editable = (
+        "payment_status",
         "status",
     )
+
+    readonly_fields = (
+        "order_number",
+        "created_at",
+    )
+
+    ordering = ("-created_at",)
 
 
 # ==========================
@@ -116,6 +134,11 @@ class CartAdmin(admin.ModelAdmin):
         "quantity",
     )
 
+    search_fields = (
+        "user__username",
+        "perfume__name",
+    )
+
 
 # ==========================
 # WISHLIST
@@ -127,6 +150,12 @@ class WishlistAdmin(admin.ModelAdmin):
     list_display = (
         "user",
         "perfume",
+        "created_at",
+    )
+
+    search_fields = (
+        "user__username",
+        "perfume__name",
     )
 
 
@@ -153,4 +182,6 @@ class ReviewAdmin(admin.ModelAdmin):
         "user__username",
         "perfume__name",
     )
+
+    ordering = ("-created_at",)
     

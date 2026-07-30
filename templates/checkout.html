@@ -26,6 +26,20 @@ Checkout
     font-weight:bold;
 }
 
+.payment-box{
+    border:2px solid #198754;
+    border-radius:15px;
+    padding:20px;
+    margin-top:20px;
+    background:#f8fff9;
+}
+
+.payment-title{
+    font-weight:bold;
+    color:#198754;
+    margin-bottom:15px;
+}
+
 </style>
 
 {% endblock %}
@@ -45,9 +59,7 @@ Checkout
 <div class="card-body">
 
 <h4 class="mb-4">
-
 Customer Information
-
 </h4>
 
 <form method="POST" action="{% url 'place_order' %}">
@@ -55,56 +67,138 @@ Customer Information
 {% csrf_token %}
 
 <div class="mb-3">
-
-<label class="form-label">
-
-Full Name
-
-</label>
-
+<label class="form-label">Full Name</label>
 <input
 type="text"
 name="name"
 class="form-control"
 required>
-
 </div>
 
 <div class="mb-3">
-
-<label class="form-label">
-
-Phone Number
-
-</label>
-
+<label class="form-label">Phone Number</label>
 <input
 type="text"
 name="phone"
 class="form-control"
 required>
-
 </div>
 
 <div class="mb-3">
+<label class="form-label">City</label>
+<input
+type="text"
+name="city"
+class="form-control"
+required>
+</div>
+
+<div class="mb-3">
+<label class="form-label">Delivery Address</label>
+<textarea
+name="address"
+rows="4"
+class="form-control"
+required></textarea>
+</div>
+
+<div class="mb-3">
+<label class="form-label">
+Payment Method
+</label>
+
+<select
+name="payment_method"
+class="form-select"
+required>
+
+<option value="COD">
+Cash On Delivery
+</option>
+
+<option value="ALLIED">
+Allied Bank Transfer
+</option>
+
+<option value="JAZZCASH">
+JazzCash
+</option>
+
+<option value="EASYPAISA">
+EasyPaisa
+</option>
+
+</select>
+
+</div>
+
+<div class="payment-box">
+
+<div class="payment-title">
+🏦 Bank / Wallet Details
+</div>
+
+<p>
+<b>Bank:</b> {{ bank_name }}
+</p>
+
+<p>
+<b>Account Title:</b> {{ account_title }}
+</p>
+
+<p>
+<b>Account Number:</b> {{ account_number }}
+</p>
+
+<p>
+<b>IBAN:</b> {{ iban }}
+</p>
+
+<p>
+<b>JazzCash:</b> {{ jazzcash }}
+</p>
+
+<p>
+<b>EasyPaisa:</b> {{ easypaisa }}
+</p>
+
+</div>
+
+<div class="mt-3">
 
 <label class="form-label">
 
-Delivery Address
+Transaction ID
+(Optional for Online Payment)
+
+</label>
+
+<input
+type="text"
+name="transaction_id"
+class="form-control"
+placeholder="Transaction ID">
+
+</div>
+
+<div class="mt-3">
+
+<label class="form-label">
+
+Order Notes
 
 </label>
 
 <textarea
-name="address"
-rows="5"
+name="notes"
+rows="3"
 class="form-control"
-required></textarea>
+placeholder="Special instructions..."></textarea>
 
 </div>
-
 <button
 type="submit"
-class="btn btn-success btn-lg w-100">
+class="btn btn-success btn-lg w-100 mt-4">
 
 ✅ Place Order
 
@@ -124,7 +218,7 @@ class="btn btn-success btn-lg w-100">
 
 <h4>
 
-Order Summary
+🧾 Order Summary
 
 </h4>
 
@@ -164,11 +258,63 @@ Rs. {{ item.subtotal }}
 
 <hr>
 
+<div class="d-flex justify-content-between">
+
+<h5>
+
+Subtotal
+
+</h5>
+
+<h5>
+
+Rs. {{ total }}
+
+</h5>
+
+</div>
+
+<div class="d-flex justify-content-between">
+
+<h5>
+
+Delivery Charges
+
+</h5>
+
+<h5 class="text-success">
+
+FREE
+
+</h5>
+
+</div>
+
+<hr>
+
 <h3 class="total-price">
 
 Total: Rs. {{ total }}
 
 </h3>
+
+<div class="alert alert-success mt-4">
+
+<b>✔ Secure Checkout</b>
+
+<ul class="mb-0 mt-2">
+
+<li>Cash On Delivery Available</li>
+
+<li>Allied Bank Transfer</li>
+
+<li>JazzCash Payment</li>
+
+<li>EasyPaisa Payment</li>
+
+</ul>
+
+</div>
 
 </div>
 

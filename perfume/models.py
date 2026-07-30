@@ -104,9 +104,7 @@ class Cart(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.perfume.name} ({self.size})"
-
-
-# ==========================
+        # ==========================
 # ORDER
 # ==========================
 
@@ -115,9 +113,23 @@ class Order(models.Model):
     STATUS_CHOICES = [
         ("Pending", "Pending"),
         ("Confirmed", "Confirmed"),
+        ("Processing", "Processing"),
         ("Shipped", "Shipped"),
         ("Delivered", "Delivered"),
         ("Cancelled", "Cancelled"),
+    ]
+
+    PAYMENT_METHODS = [
+        ("COD", "Cash On Delivery"),
+        ("ALLIED", "Allied Bank Transfer"),
+        ("JAZZCASH", "JazzCash"),
+        ("EASYPAISA", "EasyPaisa"),
+    ]
+
+    PAYMENT_STATUS = [
+        ("Pending", "Pending"),
+        ("Paid", "Paid"),
+        ("Failed", "Failed"),
     ]
 
     user = models.ForeignKey(
@@ -127,8 +139,15 @@ class Order(models.Model):
     )
 
     customer_name = models.CharField(max_length=100)
+
     phone = models.CharField(max_length=20)
+
     address = models.TextField()
+
+    city = models.CharField(
+        max_length=100,
+        default=""
+    )
 
     total_amount = models.DecimalField(
         max_digits=10,
@@ -140,16 +159,41 @@ class Order(models.Model):
         unique=True
     )
 
+    payment_method = models.CharField(
+        max_length=20,
+        choices=PAYMENT_METHODS,
+        default="COD"
+    )
+
+    transaction_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS,
+        default="Pending"
+    )
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default="Pending"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    notes = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
-        return self.order_number
+        return f"{self.order_number} - {self.customer_name}"
 
 
 # ==========================
@@ -166,6 +210,10 @@ class Wishlist(models.Model):
     perfume = models.ForeignKey(
         Perfume,
         on_delete=models.CASCADE
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
     )
 
     class Meta:
@@ -192,11 +240,15 @@ class Review(models.Model):
         related_name="reviews"
     )
 
-    rating = models.PositiveSmallIntegerField(default=5)
+    rating = models.PositiveSmallIntegerField(
+        default=5
+    )
 
     comment = models.TextField()
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
         ordering = ["-created_at"]
